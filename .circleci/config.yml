@@ -1,0 +1,30 @@
+version: 2.1
+orbs:
+  gcp-cli: circleci/gcp-cli@1.8.3
+
+jobs:
+  build:
+    docker:
+      - image: google/cloud-sdk:latest
+
+    steps:
+      - checkout
+      - gcp-cli/initialize
+      - run:
+          name: Create Redmine instance
+          command: |
+            gcloud compute instances create ${REDMINE_RESOURCE_NAME} \
+            --image=${REDMINE_IMAGE_NAME} \
+            --zone=asia-northeast1-b \
+            --tags "http-server"
+      - run:
+          name: Wait for instance is running
+          command: |
+            sleep 3
+
+workflows:
+  version: 2
+  start-redmine:
+    jobs:
+      - build:
+          context: GCP
