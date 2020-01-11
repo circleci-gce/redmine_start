@@ -11,12 +11,10 @@ jobs:
       - checkout
       - gcp-cli/initialize
       - run:
-          name: Create Redmine instance
+          name: Start Redmine instance
           command: |
-            gcloud compute instances create ${REDMINE_RESOURCE_NAME} \
-            --image=${REDMINE_IMAGE_NAME} \
-            --zone=asia-northeast1-b \
-            --tags "http-server"
+            gcloud compute instances start ${REDMINE_INSTANCE_NAME} \
+            --zone=asia-northeast1-b
       - run:
           name: Wait for instance is running
           command: |
