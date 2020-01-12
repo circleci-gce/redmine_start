@@ -16,9 +16,30 @@ jobs:
             gcloud compute instances start ${REDMINE_INSTANCE_NAME} \
             --zone=asia-northeast1-b
       - run:
-          name: Wait for instance is running
+          name: Set external IP address to environment variable 
           command: |
-            sleep 3
+            ip_addr=$(
+                       gcloud compute instances describe ${REDMINE_INSTANCE_NAME} \
+                       --format='get(networkInterfaces[0].accessConfigs[0].natIP)' \
+                       --zone=asia-northeast1-b \
+                     )
+
+            echo "export REDMINE_IP=${ip_addr}" >> $BASH_ENV
+
+
+      - run:
+          name: Install Tweepy
+          command: |
+            pip install tweepy
+      - run:
+          name: Send Job notifcation
+          command: |
+            python tweet.py \
+            ${TWITTER_CONSUMER_KEY} \
+            ${TWITTER_CONSUMER_SECRET_KEY} \
+            ${TWITTER_ACCESS_TOKEN} \
+            ${TWITTER_ACCESS_TOKEN_SECRET} \
+            ${TWITTER_RECIPIENT}
 
 workflows:
   version: 2
